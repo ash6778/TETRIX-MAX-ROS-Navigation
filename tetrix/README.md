@@ -1,5 +1,7 @@
 ## GMapping, AMCL and Navigation with 4-wheeled TETRIX MAX robot  ##
 
+The robot model is used to go from start to goal in the environment and avoid an obstacle using the ROS Navigation Stack
+
 <!-- Steps to follow before running the simulation -->
 
 1) Open terminal and in your worskspace directory, use catkin_make. Eg: roscd catkin_ws; catkin_make 
