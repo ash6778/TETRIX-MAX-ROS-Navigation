@@ -1,5 +1,7 @@
 # TETRIX-MAX-ROS-Navigation
 
+The robot model is used to navigate in the test environment and avoids an obstacle using the ROS Navigation Stack.
+
 
 1) To visualize robot model in Gazebo and RViz in an empty map use:
       
