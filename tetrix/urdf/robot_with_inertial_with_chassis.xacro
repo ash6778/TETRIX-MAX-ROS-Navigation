@@ -1,0 +1,327 @@
+<?xml version="1.0"?>
+<robot name="tetrix" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+    <xacro:include filename="$(find tetrix)/urdf/robot_gazebo.gazebo" />
+    
+    <xacro:property name="camera_link" value="0.05" /> 
+    <xacro:property name="wheel_kp" value="1000.0" />
+    <xacro:property name="wheel_kd" value="100.0" />
+    <xacro:property name="wheel_mu1" value="1" />
+    <xacro:property name="wheel_mu2" value="1" />
+    <xacro:property name="wheel_slip1" value="0.5" />
+    <xacro:property name="wheel_slip2" value="0" />
+    <xacro:property name="laser_width" value="0.1" />
+    <xacro:property name="laser_length" value="0.1" />
+    <xacro:property name="laser_height" value="0.1" />
+    <xacro:property name="wheel_inertia" value="1e-3" />
+    
+    <!-- Length along X-axis, Width along Y-axis, Height along Z-axis -->
+    <xacro:property name="base_width" value="0.288" />
+    <xacro:property name="base_length" value="0.288" />
+    <xacro:property name="base_height" value="0.6" />
+    <xacro:property name="base_mass" value="30" />
+ 
+
+    <!-- inertia = 1/12*m(h^2+d^2) -->
+    <xacro:property name="height_2" value="${base_height * base_height}" />
+    <xacro:property name="width_2" value="${base_width * base_width}" />
+    <xacro:property name="length_2" value="${base_length * base_length}" />
+    <xacro:property name="base_inertia_xx" value="${base_mass/12.0 * (height_2 + width_2)}" />
+    <xacro:property name="base_inertia_yy" value="${base_mass/12.0 * (height_2 + length_2)}" />
+    <xacro:property name="base_inertia_zz" value="${base_mass/12.0 * (width_2 + length_2)}" />
+
+
+    <!-- Dummy Link -->
+    <link name="robot_footprint"></link>
+
+    <joint name="robot_footprint_joint" type="fixed">
+       <origin xyz="0 0 0" rpy="0 0 0" />
+       <parent link="robot_footprint" />
+       <child link="base_link" />
+    </joint>
+    
+    <!-- Base Link -->
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="0.288 0.288 0.06"/>
+            </geometry>
+            <origin xyz="0.0 0.0 0.03" rpy="0 0.0 0.0"/>
+            <material name="white">
+                <color rgba="1.0 1.0 1.0 1.0"/>
+            </material>
+        </visual>  
+        <collision>
+            <geometry>
+                <box size="0.288 0.288 0.06"/>
+            </geometry>
+            <origin xyz="0.0 0.0 0.03" rpy="0 0.0 0.0"/>
+        </collision>
+        <inertial>
+            <mass value="${base_mass}"/>
+            <inertia ixx="${base_inertia_xx}" ixy="0" ixz="0" iyy="${base_inertia_yy}" iyz="0" izz="${base_inertia_zz}"/>
+        </inertial>      
+    </link>
+    
+    <!-- Wheels -->
+    <link name="left_front_wheel">
+        <visual>
+            <geometry>
+                <cylinder radius="0.05" length="0.025"/>
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 1.5707 1.5707"/>
+            <material name="black">
+                <color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="0.05" length="0.025"/>
+            </geometry>
+            <surface>
+              <friction>
+                <fdir1>1 0 0</fdir1>
+                <kp>${wheel_kp}</kp> <!-- kp and kd for rubber -->
+                <kd>${wheel_kd}</kd>
+                <mu>${wheel_mu1}</mu>
+                <mu2>${wheel_mu2}</mu2>
+                <slip1>${wheel_slip1}</slip1>
+                <slip2>${wheel_slip2}</slip2>
+             </friction>
+           </surface>
+           <origin xyz="0.0 0.0 0.0" rpy="0 1.5707 1.5707"/>
+        </collision>
+        <inertial>
+            <mass value="10"/>
+            <!--Calculate inertia matrix -->
+            <inertia  ixx="${wheel_inertia}" ixy="0" ixz="0"
+                      iyy="${wheel_inertia}" iyz="0"
+                      izz="${wheel_inertia}" />
+        </inertial>
+    </link>
+        
+    <link name="right_front_wheel">
+        <visual>
+            <geometry>
+                <cylinder radius="0.05" length="0.025"/>
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0 1.5707 1.5707"/>
+            <material name="black">
+                <color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="0.05" length="0.025"/>
+            </geometry>
+            <surface>
+              <friction>
+                <fdir1>1 0 0</fdir1>
+                <kp>${wheel_kp}</kp> <!-- kp and kd for rubber -->
+                <kd>${wheel_kd}</kd>
+                <mu>${wheel_mu1}</mu>
+                <mu2>${wheel_mu2}</mu2>
+                <slip1>${wheel_slip1}</slip1>
+                <slip2>${wheel_slip2}</slip2>
+              </friction>
+            </surface>
+            <origin xyz="0.0 0.0 0.0" rpy="0 1.5707 1.5707"/>
+        </collision>
+        <inertial>
+            <mass value="1"/>
+            <!--Calculate inertia matrix -->
+            <inertia  ixx="${wheel_inertia}" ixy="0" ixz="0"
+                      iyy="${wheel_inertia}" iyz="0"
+                      izz="${wheel_inertia}" />
+        </inertial>
+    </link>
+     
+    <link name="right_back_wheel">
+        <visual>
+            <geometry>
+                <cylinder radius="0.05" length="0.025"/>
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0 1.5707 1.5707"/>
+            <material name="black">
+                <color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="0.05" length="0.025"/>
+            </geometry>
+            <surface>
+               <friction>
+                  <fdir1>1 0 0</fdir1>
+                  <kp>${wheel_kp}</kp> <!-- kp and kd for rubber -->
+                  <kd>${wheel_kd}</kd>
+                  <mu>${wheel_mu1}</mu>
+                  <mu2>${wheel_mu2}</mu2>
+                  <slip1>${wheel_slip1}</slip1>
+                  <slip2>${wheel_slip2}</slip2>
+              </friction>
+            </surface>
+            <origin xyz="0.0 0.0 0.0" rpy="0 1.5707 1.5707"/>
+        </collision>
+        <inertial>
+            <mass value="1"/>
+            <!--Calculate inertia matrix -->
+            <inertia  ixx="${wheel_inertia}" ixy="0" ixz="0"
+                      iyy="${wheel_inertia}" iyz="0"
+                      izz="${wheel_inertia}" />
+        </inertial>
+    </link>
+     
+    <link name="left_back_wheel">
+        <visual>
+            <geometry>
+                <cylinder radius="0.05" length="0.025"/>
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0 1.5707 1.5707"/>
+            <material name="black">
+                <color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="0.05" length="0.025"/>
+            </geometry>
+            <surface>
+              <friction>
+                <fdir1>1 0 0</fdir1>
+                <kp>${wheel_kp}</kp> <!-- kp and kd for rubber -->
+                <kd>${wheel_kd}</kd>
+                <mu>${wheel_mu1}</mu>
+                <mu2>${wheel_mu2}</mu2>
+                <slip1>${wheel_slip1}</slip1>
+                <slip2>${wheel_slip2}</slip2>
+             </friction>
+           </surface>
+           <origin xyz="0.0 0.0 0.0" rpy="0 1.5707 1.5707"/>
+        </collision>
+        <inertial>
+            <mass value="1"/>
+            <!--Calculate inertia matrix -->
+            <inertia  ixx="${wheel_inertia}" ixy="0" ixz="0"
+                      iyy="${wheel_inertia}" iyz="0"
+                      izz="${wheel_inertia}" />
+        </inertial>
+    </link>
+
+    <!-- Camera Link -->
+    <link name="camera_link">
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.04 0.04 0.04"/>
+            </geometry>
+        </collision>
+
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.05 0.05 0.05"/>
+            </geometry>
+            <material name="red"/>
+        </visual>
+
+        <inertial>
+            <mass value="1e-5" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+        </inertial>
+    </link>
+     
+    <joint name="base_to_right_front_wheel" type="continuous">
+        <parent link="base_link"/>
+        <child link="right_front_wheel"/>
+        <axis xyz="0.0 1 0.0"/>
+        <origin xyz="0.100 -0.1665 0.0"/>   
+    </joint>
+    <joint name="base_to_left_front_wheel" type="continuous">
+        <parent link="base_link"/>
+        <child link="left_front_wheel"/>
+        <axis xyz="0.0 1 0.0"/>
+        <origin xyz="0.100 0.1665 0.0"/>   
+    </joint>
+    <joint name="base_to_left_back_wheel" type="continuous">
+        <parent link="base_link"/>
+        <child link="left_back_wheel"/>
+        <axis xyz="0.0 1 0.0"/>
+        <origin xyz="-0.100 0.1665 0.0"/>   
+    </joint>
+    <joint name="base_to_right_back_wheel" type="continuous">
+        <parent link="base_link"/>
+        <child link="right_back_wheel"/>
+        <axis xyz="0.0 1 0.0"/>
+        <origin xyz="-0.100 -0.1665 0.0"/>   
+    </joint>  
+   
+    <!--Camera Joint--> 
+    <joint name="camera_joint" type="fixed">
+        <axis xyz="0 1 0" />
+        <origin xyz="0.144 0 0.03 " rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="camera_link"/>
+    </joint> 
+
+    <!-- Hokuyo Link and Joint -->
+    <link name='hokuyo'>
+    <pose>0 0 0 0 0 0</pose>
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/>
+      <inertia
+          ixx="1e-6" ixy="0" ixz="0"
+          iyy="1e-6" iyz="0"
+          izz="1e-6" />
+    </inertial>
+    <collision name='hokuyo_collision'>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/>
+      <geometry>
+        <box size="${laser_length} ${laser_width} ${laser_height}"/>
+      </geometry>
+    </collision>
+    <visual name='hokuyo_visual'>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/>
+      <geometry>
+        <mesh filename="package://tetrix/meshes/hokuyo.dae"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint type="fixed" name="hokuyo_joint">
+    <origin xyz="0.0 0 0.09 " rpy="0 0 0"/>
+    <child link="hokuyo"/>
+    <parent link="base_link"/>
+    <axis xyz="0 1 0" rpy="0 0 0"/>
+    <limit effort="10000" velocity="1000"/>
+    <joint_properties damping="1.0" friction="1.0"/>
+  </joint>
+    
+  
+  <!-- Transmission -->
+  <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="base_to_right_back_wheel">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran2">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="base_to_left_back_wheel">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor2">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission> 
+   
+</robot>

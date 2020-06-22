@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Run AMCL -->
+  <include file="$(find tetrix)/launch/amcl.launch" />
+
+  <!--- Run Move Base -->
+  <include file="$(find tetrix)/launch/tetrix_move_base_launcher_2.launch" />
+
+</launch>

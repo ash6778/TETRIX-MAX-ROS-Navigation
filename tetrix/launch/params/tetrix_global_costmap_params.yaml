@@ -1,0 +1,11 @@
+global_frame: map
+rolling_window: false
+static_map: true
+width: 40.0
+height: 40.0
+track_unknown_space: true
+
+plugins:
+  - {name: static,                  type: "costmap_2d::StaticLayer"}
+  - {name: obstacles_laser,         type: "costmap_2d::VoxelLayer"}
+  - {name: inflation,               type: "costmap_2d::InflationLayer"}

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+     
+     <arg name="scan_topic" default="/tetrix/laser/scan" />
+     
+     <!-- Place map frame at odometry frame
+     <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster"
+       args="0 0 0 0 0 0 map odom 100"/> -->
+
+     <!-- Defining parameters for slam_gmapping node -->
+
+     <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping"
+     output="screen">
+        
+       <rosparam file="$(find tetrix)/launch/params/gmapping_params.yaml" command="load" />
+    
+       <remap from="scan" to="$(arg scan_topic)"/>
+        
+     </node>
+    
+</launch>
